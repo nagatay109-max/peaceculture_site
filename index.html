@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ピース・カルチャープロジェクト | NAGASAKI RELIGIOUS HERITAGE IN METAVERSE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            /* 2. font-family を変更 */
+            font-family: 'Shippori Mincho', serif;
+            background: #000;
+            color: #fff;
+            overflow-x: hidden;
+            line-height: 1.8;
+        }
+
+        /* フェードイン演出 */
+        #fadeOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            animation: fadeOut 2s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            0% { opacity: 1; }
+            100% { opacity: 0; pointer-events: none; }
+        }
+
+        /* ヘッダー */
+        header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 30px 60px;
+            z-index: 1000;
+            background: transparent;
+            transition: background 0.3s;
+        }
+
+        header.scrolled {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            color: #fff;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 40px;
+            font-size: 12px;
+            letter-spacing: 2px;
+            transition: opacity 0.3s;
+        }
+
+        nav a:hover {
+            opacity: 0.6;
+        }
+
+        /* ヒーローセクション */
+        .hero {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        /* スライドショー用のコンテナ */
+        .hero-slideshow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+
+        /* 各スライド画像 */
+        .hero-slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transform: scale(1);
+            transition: opacity 2s ease-in-out, transform 6s ease-out;
+        }
+
+        .hero-slide.active {
+            opacity: 0.6;
+            transform: scale(1.05);
+            z-index: 1;
+        }
+
+        /* ヒーローセクションのコンテンツ */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 0 20px;
+            text-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        .hero-subtitle {
+            font-size: 14px;
+            letter-spacing: 5px;
+            margin-bottom: 30px;
+            opacity: 0.9;
+        }
+
+        .hero-title {
+            font-size: clamp(40px, 8vw, 80px);
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            line-height: 1.3;
+            margin-bottom: 20px;
+        }
+
+        .hero-title-en {
+            font-size: clamp(14px, 2vw, 20px);
+            letter-spacing: 0.2em;
+            font-weight: 300;
+            opacity: 0.8;
+            margin-top: 20px;
+        }
+
+        /* セクション共通 */
+        section {
+            padding: 150px 60px;
+        }
+
+        .section-number {
+            font-size: 12px;
+            letter-spacing: 3px;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: clamp(32px, 5vw, 60px);
+            font-weight: 300;
+            letter-spacing: 0.05em;
+            margin-bottom: 60px;
+            line-height: 1.4;
+        }
+
+        .section-text {
+            font-size: 16px;
+            line-height: 2;
+            opacity: 0.8;
+            max-width: 800px;
+        }
+
+        /* About セクション */
+        .about-section {
+            background: #000;
+        }
+
+        .about-content {
+            position: relative; /* 画像を絶対配置するための親要素に設定 */
+            padding-right: 60px; 
+            max-width: 1400px; 
+            margin: 0 auto;
+        }
+        
+        /* タイトルとテキスト部分の幅を制限 */
+        .about-text-container {
+            max-width: 600px; /* テキストの幅を制限し、画像用のスペースを確保 */
+        }
+
+        .about-images {
+            position: absolute; /* 親要素 .about-content に対して絶対配置 */
+            top: 0;
+            right: 0;
+            width: 70%; /* 画像配置エリアの幅 */
+            height: 100%; /* 画像配置エリアの高さ */
+            pointer-events: none; /* テキストクリックを妨げないように */
+        }
+
+        .about-image {
+            position: absolute; /* .about-images に対して絶対配置 */
+            background: #1a1a1a;
+            overflow: hidden;
+            pointer-events: auto; /* 画像ホバーは有効にする */
+        }
+
+        /* 3枚の画像に異なるサイズと位置を設定して「無造作」感を出しつつ、重ならないように調整 */
+        .about-images .about-image:nth-child(1) {
+            width: 300px; 
+            height: 400px; 
+            top: 20px; 
+            right: 360px; 
+            z-index: 3;
+        }
+
+        .about-images .about-image:nth-child(2) {
+            width: 300px; 
+            height: 200px; 
+            top: 30px; 
+            right: 0px; 
+            z-index: 2;
+        }
+
+        .about-images .about-image:nth-child(3) {
+            width: 330px; 
+            height: 280px; 
+            top: 280px; /* 1枚目(400px)の下になるように配置 */
+            right: 0px; 
+            z-index: 1;
+        }
+
+
+        .about-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .about-image:hover img {
+            transform: scale(1.05);
+        }
+
+        /* 宗教セクション共通 */
+        .religion-section {
+            padding: 150px 0;
+            background: #000;
+        }
+
+        .religion-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 60px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: center;
+        }
+
+        /* 神道セクションのみ左右反転 */
+        .religion-section.reverse .religion-content {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .religion-section.reverse .religion-text {
+            order: 1;
+        }
+
+        .religion-section.reverse .religion-image {
+            order: 2;
+        }
+
+        .religion-image {
+            width: 100%;
+            aspect-ratio: 3/4;
+            background: #1a1a1a;
+            overflow: hidden;
+        }
+
+        .religion-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .religion-image:hover img {
+            transform: scale(1.05);
+        }
+
+        .religion-text {
+            padding: 40px 0;
+        }
+
+        .religion-subtitle {
+            font-size: 20px;
+            font-weight: 300;
+            letter-spacing: 0.1em;
+            margin-bottom: 30px;
+            opacity: 0.7;
+        }
+
+        /* Event セクション */
+        .event-section {
+            background: #000;
+        }
+
+        .event-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 100px;
+            align-items: start;
+        }
+
+        .event-details {
+            font-size: 15px;
+            line-height: 2.2;
+        }
+
+        .event-details strong {
+            display: inline-block;
+            width: 140px;
+            opacity: 0.5;
+        }
+
+        .event-description {
+            margin-top: 40px;
+            font-size: 14px;
+            line-height: 2;
+            opacity: 0.7;
+        }
+
+        /* Footer */
+        footer {
+            padding: 80px 60px 40px;
+            background: #000;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 60px;
+        }
+
+        .footer-logo {
+            font-size: 14px;
+            letter-spacing: 3px;
+            font-weight: 600;
+        }
+
+        .footer-links a {
+            display: block;
+            color: #fff;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-bottom: 15px;
+            opacity: 0.6;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            font-size: 11px;
+            opacity: 0.4;
+            letter-spacing: 1px;
+        }
+
+        /* レスポンシブ */
+        @media (max-width: 768px) {
+            header {
+                padding: 20px 30px;
+            }
+
+            nav {
+                display: none;
+            }
+
+            section {
+                padding: 80px 30px;
+            }
+            
+            .about-content {
+                padding-right: 30px; /* SPではパディングを標準に戻す */
+            }
+
+            .about-images {
+                position: static; /* SPでは絶対配置を解除し、通常フローに戻す */
+                width: 100%;
+                height: auto;
+                margin-top: 40px; /* テキストの下に配置 */
+                display: grid;
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            /* SPでは各画像の設定をリセット */
+            .about-images .about-image:nth-child(1),
+            .about-images .about-image:nth-child(2),
+            .about-images .about-image:nth-child(3) {
+                position: static;
+                width: 100%;
+                height: auto;
+                aspect-ratio: 4/5;
+            }
+
+            .religion-section {
+                padding: 80px 0;
+            }
+
+            .religion-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                padding: 0 30px;
+            }
+
+            .religion-section.reverse .religion-content {
+                direction: ltr;
+            }
+
+            .event-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            footer {
+                padding: 60px 30px 30px;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                gap: 30px;
+            }
+        }
+
+        /* スクロールアニメーション用 */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s, transform 0.8s;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div id="fadeOverlay"></div>
+
+    <header id="header">
+        <div class="header-content">
+            <div class="logo">NAGASAKI METAVERSE</div>
+            <nav>
+                <a href="#about">ABOUT</a>
+                <a href="#significance">意義</a>
+                <a href="#christianity">キリスト教</a>
+                <a href="#shinto">神道</a>
+                <a href="#buddhism">仏教</a>
+                <a href="#event">EVENT</a>
+                <a href="#contact">CONTACT</a>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <div class="hero-slideshow">
+            <img src="images/image01.png" class="hero-slide active" alt="Background 1">
+            <img src="images/image02.png" class="hero-slide" alt="Background 2">
+            <img src="images/image03.png" class="hero-slide" alt="Background 3">
+            <img src="images/image04.png" class="hero-slide" alt="Background 4">
+            <img src="images/image05.png" class="hero-slide" alt="Background 5">
+        </div>
+        
+        <div class="hero-content">
+            <div class="hero-subtitle">ピース・カルチャープロジェクト</div>
+            <h1 class="hero-title">
+                宗教共存から見る<br>
+                文化と平和
+            </h1>
+            <div class="hero-title-en">
+                NAGASAKI RELIGIOUS HERITAGE<br>
+                IN METAVERSE
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section fade-in" id="about">
+        <div class="about-content">
+            <div class="about-text-container">
+                <div class="section-number">01</div>
+                <h2 class="section-title">
+                    長崎の信仰、<br>
+                    デジタル空間に蘇る
+                </h2>
+                <p class="section-text">
+                    江戸時代から続く長崎の独特な宗教文化。仏教、キリスト教、神道が共存し、互いに影響を与え合いながら育まれた信仰の歴史を、最先端のメタバース技術で体験する新しい試みです。バーチャル空間に再現された歴史的建造物を巡り、当時の人々の想いに触れることができます。
+                </p>
+            </div>
+            <div class="about-images">
+                <div class="about-image">
+                    <img src="images/shrine.png" alt="About Image 1">
+                </div>
+                <div class="about-image">
+                    <img src="images/kyoukai.png" alt="About Image 2">
+                </div>
+                <div class="about-image">
+                    <img src="images/main.jpg" alt="About Image 3">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="about-section fade-in" id="significance">
+        <div class="about-content">
+            <div class="section-number">02</div>
+            <h2 class="section-title">
+                プロジェクトの意義と<br>
+                未来へのメッセージ
+            </h2>
+            <p class="section-text">
+                長崎は、歴史的に仏教、キリスト教、神道の3つの宗教が共存してきた稀有な土地であり、この多様性が長崎の文化的アイデンティティを形成しています。一方で、長崎は宗教弾圧という、本質的に相手の考えの拒絶・排除の歴史も経験しました。
+            </p>
+            <p class="section-text" style="margin-top: 30px;">
+                本プロジェクトは、長崎の貴重な宗教文化遺産の継承と、宗教弾圧の歴史を通じた人権・平和教育の推進を目的としています。デジタル技術を用いることで、伝統文化の保存と次世代への継承を実現します。単なる3DCG作品に留まらず、長崎の歴史が持つ普遍的なメッセージ「平和と共存」を現代世界へ発信し、多様性の尊重の重要性を示す文化的役割を担います。
+            </p>
+        </div>
+    </section>
+
+    <section class="religion-section fade-in" id="christianity">
+        <div class="religion-content">
+            <div class="religion-image">
+                <img src="images/image01.png" alt="Christianity">
+            </div>
+            <div class="religion-text">
+                <div class="section-number">03</div>
+                <h2 class="section-title">キリスト教</h2>
+                <h3 class="religion-subtitle">隠れキリシタンの祈り</h3>
+                <p class="section-text">
+                    1549年、フランシスコ・ザビエルによって日本に伝来したキリスト教は、長崎において独特の発展を遂げました。江戸幕府による禁教令の時代、信仰を守り続けた隠れキリシタンたちは、仏教や神道の形式を借りながら密かに信仰を継承しました。
+                </p>
+                <p class="section-text">
+                    大浦天主堂は現存する日本最古のゴシック様式教会建築であり、1865年の「信徒発見」の舞台となった歴史的建造物です。250年に及ぶ潜伏期間を経て再び姿を現した信徒たちの物語は、信仰の強さと人間の精神性を象徴しています。メタバース空間では、この荘厳な教会内部を細部まで再現し、ステンドグラスから差し込む光や、祈りの空間が持つ静謐な雰囲気を体験できます。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="religion-section reverse fade-in" id="shinto">
+        <div class="religion-content">
+            <div class="religion-text">
+                <div class="section-number">04</div>
+                <h2 class="section-title">神道</h2>
+                <h3 class="religion-subtitle">八百万の神々が宿る地</h3>
+                <p class="section-text">
+                    長崎における神道は、日本古来の自然信仰と土地の歴史が融合した独自の形態を持っています。諏訪神社は長崎の総鎮守として、1614年に現在の地に遷座されました。毎年10月に行われる長崎くんちは、この神社の例大祭であり、異国文化の影響を受けた独特の奉納踊りが特徴です。
+                </p>
+                <p class="section-text">
+                    神社の境内には、日本の伝統的な神域の静寂さと、長崎という国際都市の持つ多様性が共存しています。長い石段を登った先に広がる境内からは、長崎の街並みと港を一望でき、この地が古来より人々の祈りの場であったことを実感できます。メタバース体験では、境内の空気感や、鳥居をくぐる際の心の清らかさ、そして祭礼の賑わいを追体験することができます。
+                </p>
+            </div>
+            <div class="religion-image">
+                <img src="images/image05.png" alt="Shinto">
+            </div>
+        </div>
+    </section>
+
+    <section class="religion-section fade-in" id="buddhism">
+        <div class="religion-content">
+            <div class="religion-image">
+                <img src="images/image04.png" alt="Buddhism">
+            </div>
+            <div class="religion-text">
+                <div class="section-number">05</div>
+                <h2 class="section-title">仏教</h2>
+                <h3 class="religion-subtitle">唐文化が息づく寺院</h3>
+                <p class="section-text">
+                    長崎の仏教寺院は、中国文化の影響を色濃く受けた独特の建築様式を持っています。崇福寺は1629年に福建省出身の華僑によって創建された黄檗宗の寺院で、「唐寺」と呼ばれる中国様式の寺院群の代表格です。国宝に指定されている第一峰門や大雄宝殿は、江戸時代初期の中国建築の粋を今に伝えています。
+                </p>
+                <p class="section-text">
+                    興福寺や福済寺など、長崎には複数の唐寺が現存し、それぞれが独自の歴史と文化を継承しています。これらの寺院は単なる宗教施設ではなく、日中文化交流の拠点として、また海外貿易の窓口として重要な役割を果たしてきました。メタバース空間では、朱塗りの柱や精緻な彫刻、中国風の庭園など、異国情緒あふれる寺院建築の美しさを間近で感じることができます。
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <section class="event-section fade-in" id="event">
+        <div class="section-number">06</div>
+        <h2 class="section-title">
+            イベント概要
+        </h2>
+        <div class="event-content">
+            <div class="event-info">
+                <div class="event-details">
+                    <p><strong>開催期間</strong>2025年12月1日 〜 2026年2月28日</p>
+                    <p><strong>参加方法</strong>オンライン（VR / PC / スマートフォン）</p>
+                    <p><strong>参加費</strong>無料（一部有料コンテンツあり）</p>
+                    <p><strong>対応言語</strong>日本語 / 英語 / 中国語 / 韓国語</p>
+                </div>
+            </div>
+            <div class="event-description">
+                本イベントは長崎市、長崎大学、地域の宗教施設の協力のもと開催されます。歴史的資料や専門家の監修により、学術的にも価値の高いコンテンツを提供します。デジタル技術と伝統文化の融合により、新しい文化体験の形を創造します。
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-content">
+            <div class="footer-logo">NAGASAKI METAVERSE</div>
+            <div class="footer-links">
+                <a href="#about">概要</a>
+                <a href="#significance">意義</a>
+                <a href="#christianity">キリスト教</a>
+                <a href="#shinto">神道</a>
+                <a href="#buddhism">仏教</a>
+                <a href="#event">イベント情報</a>
+                <a href="mailto:info@nagasaki-metaverse.jp">お問い合わせ</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2025 NAGASAKI RELIGIOUS HERITAGE IN METAVERSE PROJECT. ALL RIGHTS RESERVED.
+        </div>
+    </footer>
+
+    <script>
+        // ヘッダーのスクロール処理
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 100) {
+                header.classList.add('scrolled');
+            } else {
+                header.classList.remove('scrolled');
+            }
+        });
+
+        // スクロールアニメーション
+        const fadeElements = document.querySelectorAll('.fade-in');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        fadeElements.forEach(element => {
+            observer.observe(element);
+        });
+
+        // スムーズスクロール
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // ヒーロースライドショーのアニメーション
+        const slides = document.querySelectorAll('.hero-slide');
+        let currentSlide = 0;
+        const slideInterval = 5000; // 5秒ごとに切り替え
+
+        function nextSlide() {
+            // 現在のスライドからactiveクラスを外す
+            slides[currentSlide].classList.remove('active');
+            // 次のスライドのインデックスを計算
+            currentSlide = (currentSlide + 1) % slides.length;
+            // 次のスライドにactiveクラスをつける
+            slides[currentSlide].classList.add('active');
+        }
+
+        // 一定時間ごとにnextSlideを実行
+        setInterval(nextSlide, slideInterval);
+    </script>
+</body>
+</html>
